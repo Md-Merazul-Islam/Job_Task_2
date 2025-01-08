@@ -9,7 +9,6 @@ from django.core.mail import send_mail
 from django.shortcuts import get_object_or_404, redirect, render
 from django.contrib.auth import authenticate, login
 from rest_framework_simplejwt.tokens import RefreshToken
-from rest_framework import generics, status
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from django.contrib.auth import get_user_model
@@ -24,17 +23,26 @@ from rest_framework_simplejwt.exceptions import TokenError, InvalidToken
 
 User = get_user_model()
 
+
 class UserRegisterView(generics.CreateAPIView):
     serializer_class = UserRegisterSerializer
 
     def perform_create(self, serializer):
         user = serializer.save(is_active=False)  # Save user as inactive
         self.send_activation_email(user)
+    
+    def create(self, request, *args, **kwargs):
+        response = super().create(request, *args, **kwargs)
+        return Response({
+            "message": "Registration successful. Please check your email for the activation link."
+        }, status=status.HTTP_201_CREATED)
 
     def send_activation_email(self, user):
         uid = urlsafe_base64_encode(force_bytes(user.pk))
         token = default_token_generator.make_token(user)
-        activation_link = f"http://127.0.0.1:8000/api/activate/{uid}/{token}/"
+        print("uid: ", uid)
+        print("Token: ", token)
+        activation_link = f"http://127.0.0.1:8000/accounts/activate/{uid}/{token}/"
         subject = "Activate Your Account"
         message = f"Hi {user.username},\n\nPlease activate your account:\n{activation_link}"
         send_mail(subject, message, 'no-reply@yourdomain.com', [user.email])
@@ -124,12 +132,6 @@ def successful(request):
 def unsuccessful(request):
     return render(request, 'unsuccessful.html')
 
-from rest_framework.views import APIView
-from rest_framework.response import Response
-from rest_framework import status
-from rest_framework_simplejwt.tokens import RefreshToken
-from rest_framework_simplejwt.exceptions import TokenError, InvalidToken
-from django.contrib.auth import logout
 
 class UserLogOutView(APIView):
 
@@ -147,7 +149,7 @@ class UserLogOutView(APIView):
                 token.blacklist()  # Invalidate the refresh token
 
             return Response({'detail': 'Successfully logged out.'}, status=status.HTTP_200_OK)
-        
+
         except TokenError as e:
             return Response({'detail': str(e)}, status=status.HTTP_400_BAD_REQUEST)
         except InvalidToken:

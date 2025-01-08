@@ -11,7 +11,7 @@ urlpatterns = [
     path('login/', UserLoginView.as_view(), name='login'),
     path('logout/', UserLogOutView.as_view(), name='login'),
     path('profile/', UserProfileView.as_view(), name='user-profile'),
-    path('activate/<uid64>/<token>/', activate, name='activate'),
-     path('successful-email-verified/', successful, name='verified_success'),
-    path('unsuccessful-email-verified/',unsuccessful, name='verified_failed'),
+    path('activate/<uidb64>/<token>/',activate, name='activate'),
+     path('successful-email-verified/', successful, name='activation_success'),
+    path('unsuccessful-email-verified/',unsuccessful, name='activation_failed'),
 ]
