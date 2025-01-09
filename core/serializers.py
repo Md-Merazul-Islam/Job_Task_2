@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Student, Expense, Group, Settlement, Category
+from .models import Student, Expense, Group, Settlement, Category,MonthlyCost
 
 class CategorySerializer(serializers.ModelSerializer):
     class Meta:
@@ -24,4 +24,10 @@ class GroupSerializer(serializers.ModelSerializer):
 class SettlementSerializer(serializers.ModelSerializer):
     class Meta:
         model = Settlement
+        fields = '__all__'
+
+
+class MonthlyCostSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = MonthlyCost
         fields = '__all__'

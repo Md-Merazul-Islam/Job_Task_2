@@ -32,7 +32,6 @@ class Student(AbstractUser):
 
 
 class Expense(models.Model):
-    # Default to a specific student's ID
     student = models.ForeignKey(
         Student, related_name='expenses', on_delete=models.CASCADE, default=1)
     category = models.ForeignKey(Category, on_delete=models.CASCADE)
@@ -52,8 +51,6 @@ class Group(models.Model):
     type = models.CharField(max_length=50, choices=[(
         'hostel', 'Hostel Roommates'), ('project', 'Project Teams'), ('trip', 'Trip Groups')])
 
-# Settlement Model
-
 
 class Settlement(models.Model):
     expense = models.ForeignKey(Expense, on_delete=models.CASCADE)
@@ -61,3 +58,13 @@ class Settlement(models.Model):
         'pending', 'Pending'), ('completed', 'Completed')])
     settlement_method = models.CharField(max_length=50)
     due_date = models.DateField()
+
+
+class MonthlyCost(models.Model):
+    student = models.ForeignKey(Student, related_name='monthly_costs', on_delete=models.CASCADE)
+    month = models.CharField(max_length=10)  # e.g., January
+    year = models.IntegerField()
+    total_expense = models.FloatField(default=0.0)
+
+    def __str__(self):
+        return f"{self.student.username} - {self.month} {self.year}: {self.total_expense}"
