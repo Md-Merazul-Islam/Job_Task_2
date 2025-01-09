@@ -68,7 +68,7 @@ class UserRegisterSerializer(serializers.ModelSerializer):
             email=validated_data['email']
         )
         user.set_password(validated_data['password'])
-        user.is_active = False  # Inactive until email confirmation
+        user.is_active = False  
         user.save()
 
         # Create a default profile
