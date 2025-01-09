@@ -1,15 +1,21 @@
 from rest_framework import serializers
-from .models import Student, Expense, Group, Settlement, Category,MonthlyCost
+from .models import Student, Expense, Group, Settlement, Category,MonthlyCost,UPIPayment
 
 class CategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = Category
         fields = ['id', 'name']
-        
+
+
 class StudentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Student
-        fields = ['id', 'username', 'email', 'college', 'semester', 'default_payment_methods']
+        fields = ['user', 'upi_id', 'college', 'semester', 'default_payment_method']
+
+    def validate_upi_id(self, value):
+        if value and not value.endswith('@upi'):  
+            raise serializers.ValidationError("Invalid UPI ID format.")
+        return value
 
 class ExpenseSerializer(serializers.ModelSerializer):
     class Meta:
@@ -31,3 +37,10 @@ class MonthlyCostSerializer(serializers.ModelSerializer):
     class Meta:
         model = MonthlyCost
         fields = '__all__'
+        
+        
+
+class UPIPaymentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = UPIPayment
+        fields = ['settlement', 'upi_id', 'transaction_id', 'payment_status']
